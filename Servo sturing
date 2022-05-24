@@ -1,0 +1,127 @@
+
+/* 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                                   //
+//  ///////////  //  ///////      //////         ////////    ////////  ////    //  ////////  //  //////    ////////  //
+//      //       //  //    ///  //      //       //      //  //        //  //  //  //        //  //    //  //        //
+//      //       //  ///////    //      //       //      //  ////////  //    ////  ////////  //  //////    ////////  //
+//      //       //  //    ///  //      //       //      //  //        //      //  //        //  //  //    //        //
+//      //       //  ///////      //////         ////////    ////////  //      //  ////////  //  //    //  ////////  //
+//                                                                                                                   //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Module: ESP32 Wroom
+pinout: Servo = 21;
+*/
+////////// INCLUDE //////////
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <Arduino_JSON.h>
+#include <ESP32Servo.h>
+////////// CONST CHAR //////////
+const char *ssid = "SSID";
+const char *password = "PASSWORD";
+////////// INT //////////
+int pos = 0;    // variable to store the servo position
+int servoPin = 21;// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
+int welkeknop;
+int httpResponseCode;
+////////// BOOL //////////
+bool ledstate;
+////////// STRING //////////
+String payload;
+String serverNameKnop = {"http://gip20212022.gobbin.be/api/tibo/knop/5"};//Your Domain name with URL path or IP address with path
+String serverPath;
+////////// UNSIGNED LONG //////////
+unsigned long lastTime = 0;
+//unsigned long timerDelay = 600000; // Timer set to 10 minutes (600000)
+unsigned long timerDelay = 5000; // Set timer to 5 seconds (5000)
+////////// SERVO ///////////
+Servo myservo;  // create servo object to control a servo
+////////// SETUP //////////
+void setup()
+{
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  myservo.setPeriodHertz(50);    // standard 50 hz servo
+  myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 18 to the servo object
+  Serial.begin(115200); // Start Serial monitor
+  
+  WiFi.begin(ssid, password); // Start wifi
+  Serial.println("Connecting");
+  while (WiFi.status() != WL_CONNECTED) //Connect to wifi
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to WiFi network with IP Address: ");
+  Serial.println(WiFi.localIP()); // print IP adress
+  Serial.println("Timer set to 5 seconds (timerDelay variable), it will take 5 seconds before publishing the first reading.");
+}
+////////// LOOP //////////
+void loop()
+{
+  if ((millis() - lastTime) > timerDelay)
+  {
+    if (WiFi.status() == WL_CONNECTED) //Check WiFi connection status
+    {
+      HTTPClient http; // Start the http server client
+      
+        serverPath = serverNameKnop; // link the URL to a path. here you can ad someting else to your URL
+        http.begin(serverPath.c_str()); // Your Domain name with URL path or IP address with path
+        httpResponseCode= http.GET(); // GET request
+        if (httpResponseCode > 0) // Check if something came in or not
+        {
+          Serial.print("HTTP Response code: ");
+          Serial.println(httpResponseCode);
+          payload = http.getString(); // Get the data 
+          Serial.println(payload);
+          JSONVar myObject = JSON.parse(payload); // put the json into a var
+          if (JSON.typeof(myObject) == "undefined")// JSON.typeof(jsonVar) can be used to get the type of the var
+          {
+            Serial.println("Parsing input failed!");
+            return;
+          }
+          Serial.print("JSON.typeof(myObject) = ");
+          Serial.println(JSON.typeof(myObject)); // prints: object
+          if (myObject.hasOwnProperty("welkeKnop")) // myObject.hasOwnProperty(key) checks if the object contains an entry for key
+          {
+            Serial.print("myObject[\"welkeKnop\"] = ");
+            Serial.println((int)myObject["welkeKnop"]);
+            welkeknop = (int)myObject["welkeKnop"]; // put the number of button into the variable
+          }
+          if (myObject.hasOwnProperty("statusKnop"))
+          {
+            Serial.print("myObject[\"statusKnop\"] = ");
+            Serial.println((bool)myObject["statusKnop"]);
+            ledstate = (bool)myObject["statusKnop"]; // put the ledstate into the variable 
+            Serial.println();
+          }
+          else
+          {
+            Serial.print("Error code: ");  // error trying to connect
+            Serial.println(httpResponseCode);
+          }
+        }
+        if (ledstate == 1)
+        {
+          for (pos = 0; pos <= 255; pos += 1) { // goes from 0 degrees to 180 degrees
+          // in steps of 1 degree
+          myservo.write(pos);    // tell servo to go to position in variable 'pos'
+          delay(5);
+          }
+          delay(1000)
+          for (pos = 255; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+          myservo.write(pos);    // tell servo to go to position in variable 'pos'
+          delay(5);             // waits 15ms for the servo to reach the position
+          }
+        }
+        
+        //digitalWrite(LED[i], ledstate); // set on/off the good led
+      }
+      lastTime = millis();
+    
+  }
+}
