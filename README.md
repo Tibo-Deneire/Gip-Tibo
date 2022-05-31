@@ -4,7 +4,8 @@ Welkom, hier zullen alle bestanden en assets die gebruikt worden in mijn GIP boe
 
 # Oculus hands
 
-
+# VR RIG
+Dit is de VR RIG van de Unity XR Interaction Toolkit die ik gemaakt heb. Deze VR RIG heeft een Locomotion systeem, een Continuous move systeem en een continuous turn systeem. De VR RIG is ook uitgerust met fysieke handen.
 
 
 # Logo VTI Tielt
