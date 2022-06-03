@@ -8,6 +8,8 @@ Hier zullen er foto's en video's terug te vinden zijn van mijn GIP werk
 # VR RIG
 Dit is de VR RIG van de Unity XR Interaction Toolkit die ik gemaakt heb. Deze VR RIG heeft een Locomotion systeem, een Continuous move systeem en een continuous turn systeem. De VR RIG is ook uitgerust met fysieke handen.
 
+# Puch Button
+De knoppen die ik gebruikt heb zijn knoppen die je met een fysiek hand moet indrukken. Er zitten verschillende scripts die een unity event triggeren. Ook sturen sommige scripts een JSON naar een website.
 
 # Logo VTI Tielt
 
