@@ -3,7 +3,7 @@
 Welkom, hier zullen alle bestanden en assets die gebruikt worden in mijn GIP boek terug te vinden zijn.
 
 # Beeldmateriaal
-Hier zullen er foto's en video's terug te vinden zijn van mijn GIP werk
+Hier zullen er foto's en video's terug te vinden zijn van mijn GIP werk. De video van mijn realisaties is terug te vinden op https://youtu.be/TrGUHmLvyWs.
 
 # VR RIG
 Dit is de VR RIG van de Unity XR Interaction Toolkit die ik gemaakt heb. Deze VR RIG heeft een Locomotion systeem, een Continuous move systeem en een continuous turn systeem. De VR RIG is ook uitgerust met fysieke handen.
